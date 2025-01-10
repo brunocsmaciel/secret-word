@@ -1,14 +1,13 @@
-import "./StartScreen.css"
+import "./StartScreen.css";
 
-function StartScreen() {
+function StartScreen({ startGame }) {
   return (
-    <div>
-        <h1>Secret Word</h1>
-        <p>Press the button to start</p>
-        <button>Start!</button>
-      
+    <div className="start">
+      <h1>Secret Word</h1>
+      <p>Press the button to start</p>
+      <button onClick={startGame}>Start!</button>
     </div>
-  )
+  );
 }
 
-export default StartScreen
+export default StartScreen;
