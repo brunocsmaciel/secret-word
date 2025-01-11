@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { wordsList } from "./data/words";
 
@@ -12,6 +12,8 @@ const stages = [
   { id: 3, name: "end" },
 ];
 
+const guessesQuantity = 3;
+
 function App() {
   const [gameStage, setGameStage] = useState(stages[0].name);
   const [words] = useState(wordsList);
@@ -21,11 +23,12 @@ function App() {
   const [letters, setLetters] = useState([]);
   const [guessedLetters, setGuessedLetters] = useState([]);
   const [wrongLetters, setWrongLetters] = useState([]);
-  const [guesses, setGuesses] = useState(3);
+  const [guesses, setGuesses] = useState(guessesQuantity);
   const [score, setScore] = useState(0);
 
   // starts the secret word game
   const startGame = () => {
+    clearLetterStates();
     const { word, category } = pickDictionary();
 
     // create an array of letters
@@ -58,11 +61,55 @@ function App() {
 
   // process the letter input
   const verifyLetter = (letter) => {
-    console.log(letter);
+    const lowerCaseLetter = letter.toLowerCase();
+
+    if (
+      wrongLetters.includes(lowerCaseLetter) ||
+      guessedLetters.includes(lowerCaseLetter)
+    ) {
+      return;
+    }
+
+    if (letters.includes(lowerCaseLetter)) {
+      setGuessedLetters((actualGuessedLetters) => [
+        ...actualGuessedLetters,
+        lowerCaseLetter,
+      ]);
+    } else {
+      setWrongLetters((actualWrongLetters) => [
+        ...actualWrongLetters,
+        lowerCaseLetter,
+      ]);
+
+      setGuesses(guesses - 1);
+    }
   };
+
+  const clearLetterStates = () => {
+    setGuessedLetters([]);
+    setWrongLetters([]);
+  };
+
+  useEffect(() => {
+    if (guesses <= 0) {
+      clearLetterStates();
+      setGameStage(stages[2].name);
+    }
+  }, [guesses]);
+
+  useEffect(() => {
+    const uniqueLetters = [...new Set(letters)];
+
+    if (guessedLetters.length === uniqueLetters.length) {
+      setScore((actualScore) => (actualScore += 100));
+      startGame();
+    }
+  }, [guessedLetters]);
 
   // restart the game
   const retry = () => {
+    setScore(0);
+    setGuesses(guessesQuantity);
     setGameStage(stages[0].name);
   };
   return (
@@ -81,7 +128,7 @@ function App() {
             score={score}
           />
         )}
-        {gameStage === "end" && <GameOver retry={retry} />}
+        {gameStage === "end" && <GameOver retry={retry} score={score} />}
       </div>
     </>
   );

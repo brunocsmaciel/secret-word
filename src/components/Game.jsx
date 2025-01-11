@@ -46,7 +46,7 @@ const Game = ({
       <div className="letterContainer">
         <p>Guess one letter of the word:</p>
         <form onSubmit={handleSubmit}>
-          <input
+          <input className="input"
             type="text"
             name="letter"
             maxLength="1"
@@ -60,7 +60,7 @@ const Game = ({
         <div className="wrongLettersContainer">
           <p>Letters already selected:</p>
           {wrongLetters.map((letter, i) => (
-            <span key={i}>{letter}</span>
+            <span key={i}>{letter},</span>
           ))}
         </div>
       </div>
